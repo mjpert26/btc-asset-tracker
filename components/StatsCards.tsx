@@ -1,36 +1,40 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Package, CheckCircle, Wrench, Archive } from "lucide-react";
+import { Package, Users, Wrench, CheckCircle } from "lucide-react";
 
 const stats = [
   {
     title: "Total Assets",
-    value: "15",
-    change: "+2 this month",
+    value: "157",
+    subtitle: "items",
     icon: Package,
-    gradient: "from-blue-500 to-cyan-400",
+    trend: "+12% from last month",
+    trendPositive: true,
   },
   {
     title: "Active Assignments",
-    value: "12",
-    change: "+3 this week",
-    icon: CheckCircle,
-    gradient: "from-green-500 to-emerald-400",
+    value: "142",
+    subtitle: "assigned",
+    icon: Users,
+    trend: "+8% from last month",
+    trendPositive: true,
   },
   {
     title: "In Repair",
-    value: "2",
-    change: "-1 from last week",
+    value: "8",
+    subtitle: "items",
     icon: Wrench,
-    gradient: "from-yellow-500 to-orange-400",
+    trend: "-3% from last month",
+    trendPositive: true,
   },
   {
     title: "Available",
-    value: "1",
-    change: "Ready to assign",
-    icon: Archive,
-    gradient: "from-purple-500 to-pink-400",
+    value: "7",
+    subtitle: "items",
+    icon: CheckCircle,
+    trend: "+2 from last week",
+    trendPositive: true,
   },
 ];
 
@@ -42,25 +46,37 @@ export default function StatsCards() {
           key={stat.title}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
+          transition={{ duration: 0.5, delay: index * 0.1 }}
+          whileHover={{ y: -4, scale: 1.02 }}
           className="relative group"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-400/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="relative bg-[#1E293B] backdrop-blur border border-white/10 rounded-2xl p-6 hover:border-blue-500/50 transition-colors duration-300">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-blue-500/50 transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
-              <div
-                className={`p-3 rounded-xl bg-gradient-to-r ${stat.gradient}`}
-              >
+              <div className="p-3 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl">
                 <stat.icon className="w-6 h-6 text-white" />
               </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold text-white mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-sm text-gray-400">{stat.subtitle}</div>
+              </div>
             </div>
-            <h3 className="text-gray-400 text-sm font-medium mb-1">
-              {stat.title}
-            </h3>
-            <div className="flex items-end justify-between">
-              <p className="text-4xl font-bold text-white">{stat.value}</p>
+            <div className="mb-3">
+              <h3 className="text-sm font-medium text-gray-300">
+                {stat.title}
+              </h3>
             </div>
-            <p className="text-xs text-gray-500 mt-2">{stat.change}</p>
+            <div className="flex items-center gap-2">
+              <div
+                className={`text-xs font-medium ${
+                  stat.trendPositive ? "text-emerald-400" : "text-red-400"
+                }`}
+              >
+                {stat.trend}
+              </div>
+            </div>
           </div>
         </motion.div>
       ))}

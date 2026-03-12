@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Big Think Capital - IT Asset Tracking",
-  description: "Premium IT asset tracking dashboard for Big Think Capital",
+  title: "Big Think Capital - IT Asset Management",
+  description: "Premium IT asset tracking dashboard for enterprise asset management",
 };
 
 export default function RootLayout({
@@ -16,9 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        {children}
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
