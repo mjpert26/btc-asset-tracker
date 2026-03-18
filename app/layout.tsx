@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Big Think Capital - IT Asset Management",
-  description: "Premium IT asset tracking dashboard for enterprise asset management",
+  title: "Big Think Capital - IT Asset Dashboard",
+  description: "Premium IT asset and laptop tracking dashboard for Big Think Capital's IT team",
 };
 
 export default function RootLayout({

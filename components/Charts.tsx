@@ -1,199 +1,145 @@
 "use client";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Activity, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, Activity } from "lucide-react";
 
 export default function Charts() {
-  const chartData = [
-    { month: "Jan", assets: 145, assignments: 132 },
-    { month: "Feb", assets: 148, assignments: 135 },
-    { month: "Mar", assets: 151, assignments: 138 },
-    { month: "Apr", assets: 153, assignments: 140 },
-    { month: "May", assets: 155, assignments: 141 },
-    { month: "Jun", assets: 157, assignments: 142 },
+  const assetTrends = [
+    { month: "Jan", total: 42, available: 15, checkedOut: 25, repair: 2 },
+    { month: "Feb", total: 43, available: 12, checkedOut: 28, repair: 3 },
+    { month: "Mar", total: 45, available: 14, checkedOut: 28, repair: 3 },
+    { month: "Apr", total: 45, available: 13, checkedOut: 29, repair: 3 },
+    { month: "May", total: 46, available: 10, checkedOut: 32, repair: 4 },
+    { month: "Jun", total: 47, available: 11, checkedOut: 32, repair: 4 },
   ];
 
-  const maxValue = Math.max(...chartData.map(d => Math.max(d.assets, d.assignments)));
+  const categoryDistribution = [
+    { category: "Laptops", count: 28, percentage: 60 },
+    { category: "Monitors", count: 10, percentage: 21 },
+    { category: "Accessories", count: 6, percentage: 13 },
+    { category: "Docking Stations", count: 3, percentage: 6 },
+  ];
+
+  const maxValue = Math.max(...assetTrends.map(d => d.total));
 
   return (
-    <section className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-xl font-semibold text-white mb-1">Asset Growth</h3>
-              <p className="text-gray-400 text-sm">Total assets over time</p>
-            </div>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400">
-              <BarChart3 className="w-5 h-5 text-white" />
-            </div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="bg-slate-900/50 backdrop-blur border border-slate-800 rounded-2xl p-6"
+      >
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-1">Asset Trends</h3>
+            <p className="text-sm text-slate-400">Last 6 months overview</p>
           </div>
+          <div className="flex items-center gap-2 text-emerald-400">
+            <TrendingUp className="w-4 h-4" />
+            <span className="text-sm font-medium">+11.9%</span>
+          </div>
+        </div>
 
-          <div className="flex items-end justify-between h-64 gap-3">
-            {chartData.map((data, index) => (
-              <motion.div
-                key={data.month}
-                initial={{ height: 0 }}
-                animate={{ height: `${(data.assets / maxValue) * 100}%` }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                className="flex-1 relative group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg group-hover:from-blue-500 group-hover:to-blue-300 transition-all duration-300">
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                    {data.assets} assets
-                  </div>
+        <div className="space-y-4">
+          <div className="flex items-end justify-between gap-2 h-48">
+            {assetTrends.map((data, index) => (
+              <div key={index} className="flex-1 flex flex-col items-center gap-2">
+                <div className="w-full flex flex-col items-center gap-1 flex-1 justify-end">
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: `${(data.checkedOut / maxValue) * 100}%` }}
+                    transition={{ duration: 0.8, delay: 0.1 * index }}
+                    className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t"
+                  ></motion.div>
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: `${(data.available / maxValue) * 100}%` }}
+                    transition={{ duration: 0.8, delay: 0.1 * index }}
+                    className="w-full bg-gradient-to-t from-emerald-600 to-emerald-400"
+                  ></motion.div>
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: `${(data.repair / maxValue) * 100}%` }}
+                    transition={{ duration: 0.8, delay: 0.1 * index }}
+                    className="w-full bg-gradient-to-t from-orange-600 to-orange-400 rounded-b"
+                  ></motion.div>
                 </div>
-                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-gray-400 text-xs">
-                  {data.month}
-                </div>
-              </motion.div>
+                <span className="text-xs text-slate-400 font-medium">{data.month}</span>
+              </div>
             ))}
           </div>
 
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10">
+          <div className="flex items-center justify-center gap-6 pt-4 border-t border-slate-800">
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-green-400" />
-              <span className="text-green-400 text-sm font-medium">+8.3%</span>
-              <span className="text-gray-400 text-sm">vs last period</span>
+              <div className="w-3 h-3 rounded-full bg-gradient-to-br from-blue-600 to-blue-400"></div>
+              <span className="text-xs text-slate-400">Checked Out</span>
             </div>
-            <div className="text-gray-400 text-sm">6 months</div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-xl font-semibold text-white mb-1">Assignment Rate</h3>
-              <p className="text-gray-400 text-sm">Active assignments trend</p>
-            </div>
-            <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-400">
-              <Activity className="w-5 h-5 text-white" />
-            </div>
-          </div>
-
-          <div className="relative h-64">
-            <svg className="w-full h-full" viewBox="0 0 400 200" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="areaGradient" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              
-              <motion.path
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
-                d="M 0 150 L 66 140 L 133 130 L 200 120 L 267 115 L 333 110 L 400 105"
-                fill="none"
-                stroke="url(#lineGradient)"
-                strokeWidth="3"
-                className="drop-shadow-lg"
-              />
-              
-              <defs>
-                <linearGradient id="lineGradient" x1="0" x2="1" y1="0" y2="0">
-                  <stop offset="0%" stopColor="#3B82F6" />
-                  <stop offset="100%" stopColor="#06B6D4" />
-                </linearGradient>
-              </defs>
-              
-              <motion.path
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1, delay: 0.5 }}
-                d="M 0 150 L 66 140 L 133 130 L 200 120 L 267 115 L 333 110 L 400 105 L 400 200 L 0 200 Z"
-                fill="url(#areaGradient)"
-              />
-
-              {chartData.map((data, index) => (
-                <motion.circle
-                  key={data.month}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
-                  cx={index * 66.67}
-                  cy={150 - (data.assignments / maxValue) * 45}
-                  r="4"
-                  fill="#3B82F6"
-                  className="cursor-pointer hover:r-6 transition-all"
-                />
-              ))}
-            </svg>
-
-            <div className="absolute bottom-0 left-0 right-0 flex justify-between px-2">
-              {chartData.map((data) => (
-                <span key={data.month} className="text-gray-400 text-xs">
-                  {data.month}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10">
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-green-400" />
-              <span className="text-green-400 text-sm font-medium">+7.6%</span>
-              <span className="text-gray-400 text-sm">utilization rate</span>
+              <div className="w-3 h-3 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-400"></div>
+              <span className="text-xs text-slate-400">Available</span>
             </div>
-            <div className="text-gray-400 text-sm">90.4% assigned</div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-gradient-to-br from-orange-600 to-orange-400"></div>
+              <span className="text-xs text-slate-400">In Repair</span>
+            </div>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6"
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="bg-slate-900/50 backdrop-blur border border-slate-800 rounded-2xl p-6"
       >
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-semibold text-white mb-1">Asset Distribution</h3>
-            <p className="text-gray-400 text-sm">By category and status</p>
+            <h3 className="text-lg font-semibold text-white mb-1">Asset Distribution</h3>
+            <p className="text-sm text-slate-400">By category breakdown</p>
           </div>
+          <Activity className="w-5 h-5 text-blue-400" />
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: "Laptops", count: 68, total: 157, color: "from-blue-600 to-blue-400" },
-            { label: "Monitors", count: 52, total: 157, color: "from-cyan-600 to-cyan-400" },
-            { label: "Peripherals", count: 29, total: 157, color: "from-indigo-600 to-indigo-400" },
-            { label: "Other", count: 8, total: 157, color: "from-purple-600 to-purple-400" },
-          ].map((item, index) => (
+        <div className="space-y-5">
+          {categoryDistribution.map((item, index) => (
             <motion.div
-              key={item.label}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: 0.3 + index * 0.1 }}
-              className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all group"
+              key={index}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
             >
-              <div className="text-gray-400 text-sm mb-2">{item.label}</div>
-              <div className="text-2xl font-bold text-white mb-3">{item.count}</div>
-              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-white">{item.category}</span>
+                <span className="text-sm text-slate-400">{item.count} assets</span>
+              </div>
+              <div className="relative h-2 bg-slate-800 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: `${(item.count / item.total) * 100}%` }}
-                  transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
-                  className={`h-full bg-gradient-to-r ${item.color} rounded-full`}
-                />
+                  animate={{ width: `${item.percentage}%` }}
+                  transition={{ duration: 1, delay: 0.6 + index * 0.1 }}
+                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full"
+                ></motion.div>
               </div>
-              <div className="text-gray-400 text-xs mt-2">
-                {Math.round((item.count / item.total) * 100)}% of total
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-xs text-slate-500">{item.percentage}% of total</span>
               </div>
             </motion.div>
           ))}
         </div>
+
+        <div className="mt-6 pt-6 border-t border-slate-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-slate-400 mb-1">Total Active Assets</p>
+              <p className="text-2xl font-bold text-white">47</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-slate-400 mb-1">Utilization Rate</p>
+              <p className="text-2xl font-bold text-blue-400">68%</p>
+            </div>
+          </div>
+        </div>
       </motion.div>
-    </section>
+    </div>
   );
 }

@@ -1,40 +1,39 @@
 "use client";
-
 import { motion } from "framer-motion";
-import { Package, Users, Wrench, CheckCircle } from "lucide-react";
+import { Laptop, Users, Check, Wrench } from "lucide-react";
 
 const stats = [
   {
-    title: "Total Assets",
-    value: "157",
-    subtitle: "items",
-    icon: Package,
-    trend: "+12% from last month",
-    trendPositive: true,
+    label: "Total Assets",
+    value: "47",
+    icon: Laptop,
+    gradient: "from-blue-500 to-blue-600",
+    bgColor: "bg-blue-500/10",
+    iconColor: "text-blue-400",
   },
   {
-    title: "Active Assignments",
-    value: "142",
-    subtitle: "assigned",
+    label: "Checked Out",
+    value: "32",
     icon: Users,
-    trend: "+8% from last month",
-    trendPositive: true,
+    gradient: "from-green-500 to-green-600",
+    bgColor: "bg-green-500/10",
+    iconColor: "text-green-400",
   },
   {
-    title: "In Repair",
-    value: "8",
-    subtitle: "items",
+    label: "Available",
+    value: "11",
+    icon: Check,
+    gradient: "from-emerald-500 to-emerald-600",
+    bgColor: "bg-emerald-500/10",
+    iconColor: "text-emerald-400",
+  },
+  {
+    label: "In Repair",
+    value: "4",
     icon: Wrench,
-    trend: "-3% from last month",
-    trendPositive: true,
-  },
-  {
-    title: "Available",
-    value: "7",
-    subtitle: "items",
-    icon: CheckCircle,
-    trend: "+2 from last week",
-    trendPositive: true,
+    gradient: "from-orange-500 to-orange-600",
+    bgColor: "bg-orange-500/10",
+    iconColor: "text-orange-400",
   },
 ];
 
@@ -43,38 +42,30 @@ export default function StatsCards() {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       {stats.map((stat, index) => (
         <motion.div
-          key={stat.title}
+          key={stat.label}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}
-          whileHover={{ y: -4, scale: 1.02 }}
-          className="relative group"
+          className="relative bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 overflow-hidden group"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-blue-500/50 transition-all duration-300">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl">
-                <stat.icon className="w-6 h-6 text-white" />
+          <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+          
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`${stat.bgColor} rounded-xl p-3`}>
+                <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
               </div>
-              <div className="text-right">
-                <div className="text-3xl font-bold text-white mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-gray-400">{stat.subtitle}</div>
+              <div className={`text-xs font-medium ${stat.iconColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}>
+                View Details →
               </div>
             </div>
-            <div className="mb-3">
-              <h3 className="text-sm font-medium text-gray-300">
-                {stat.title}
-              </h3>
-            </div>
-            <div className="flex items-center gap-2">
-              <div
-                className={`text-xs font-medium ${
-                  stat.trendPositive ? "text-emerald-400" : "text-red-400"
-                }`}
-              >
-                {stat.trend}
+            
+            <div className="space-y-1">
+              <div className="text-3xl font-bold text-white tracking-tight">
+                {stat.value}
+              </div>
+              <div className="text-sm text-gray-400 font-medium">
+                {stat.label}
               </div>
             </div>
           </div>

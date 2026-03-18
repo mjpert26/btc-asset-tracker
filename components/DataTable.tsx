@@ -1,198 +1,222 @@
 "use client";
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Filter, Download, ChevronDown } from "lucide-react";
+import { Search, ArrowUpDown, Calendar } from "lucide-react";
+import { useState } from "react";
 
 interface Asset {
   id: string;
+  assetTag: string;
   type: string;
-  model: string;
+  brand: string;
   serialNumber: string;
+  status: "Available" | "Checked Out" | "In Repair" | "Retired";
   assignedTo: string;
-  status: "Active" | "In Repair" | "Available";
-  location: string;
   purchaseDate: string;
 }
 
-const mockAssets: Asset[] = [
-  {
-    id: "BTC-001",
-    type: "Laptop",
-    model: "MacBook Pro 16\"",
-    serialNumber: "C02XJ4SGJG5H",
-    assignedTo: "Sarah Chen",
-    status: "Active",
-    location: "New York Office",
-    purchaseDate: "2023-08-15"
-  },
-  {
-    id: "BTC-002",
-    type: "Laptop",
-    model: "Dell XPS 15",
-    serialNumber: "5CD3456FGH",
-    assignedTo: "Mike Rodriguez",
-    status: "Active",
-    location: "San Francisco Office",
-    purchaseDate: "2023-07-22"
-  },
-  {
-    id: "BTC-003",
-    type: "Laptop",
-    model: "Lenovo ThinkPad X1",
-    serialNumber: "PF2ABCD9",
-    assignedTo: "Jessica Park",
-    status: "Active",
-    location: "Chicago Office",
-    purchaseDate: "2023-09-10"
-  },
-  {
-    id: "BTC-004",
-    type: "Laptop",
-    model: "HP EliteBook 840",
-    serialNumber: "8CG4567HJK",
-    assignedTo: "David Kumar",
-    status: "In Repair",
-    location: "Austin Office",
-    purchaseDate: "2023-06-18"
-  },
-  {
-    id: "BTC-005",
-    type: "Monitor",
-    model: "Dell UltraSharp 27\"",
-    serialNumber: "CN-0K2MNP",
-    assignedTo: "Sarah Chen",
-    status: "Active",
-    location: "New York Office",
-    purchaseDate: "2023-08-20"
-  },
-  {
-    id: "BTC-006",
-    type: "Monitor",
-    model: "LG 34\" Ultrawide",
-    serialNumber: "LG34WK95U",
-    assignedTo: "Mike Rodriguez",
-    status: "Active",
-    location: "San Francisco Office",
-    purchaseDate: "2023-07-25"
-  },
-  {
-    id: "BTC-007",
-    type: "Monitor",
-    model: "Samsung 32\" 4K",
-    serialNumber: "S32UR59C",
-    assignedTo: "Jessica Park",
-    status: "Active",
-    location: "Chicago Office",
-    purchaseDate: "2023-09-15"
-  },
-  {
-    id: "BTC-008",
-    type: "Monitor",
-    model: "Dell UltraSharp 27\"",
-    serialNumber: "CN-0K3QRS",
-    assignedTo: "David Kumar",
-    status: "Active",
-    location: "Austin Office",
-    purchaseDate: "2023-06-20"
-  },
-  {
-    id: "BTC-009",
-    type: "Mouse",
-    model: "Logitech MX Master 3",
-    serialNumber: "LGI2345MX3",
-    assignedTo: "Sarah Chen",
-    status: "Active",
-    location: "New York Office",
-    purchaseDate: "2023-08-16"
-  },
-  {
-    id: "BTC-010",
-    type: "Keyboard",
-    model: "Apple Magic Keyboard",
-    serialNumber: "MRMH2LL/A",
-    assignedTo: "Mike Rodriguez",
-    status: "Active",
-    location: "San Francisco Office",
-    purchaseDate: "2023-07-23"
-  },
-  {
-    id: "BTC-011",
-    type: "Webcam",
-    model: "Logitech Webcam HD Pro",
-    serialNumber: "LGI9876WC",
-    assignedTo: "Jessica Park",
-    status: "Active",
-    location: "Chicago Office",
-    purchaseDate: "2023-09-12"
-  },
-  {
-    id: "BTC-012",
-    type: "Laptop",
-    model: "MacBook Pro 16\"",
-    serialNumber: "C02YK5THJG5K",
-    assignedTo: "Unassigned",
-    status: "Available",
-    location: "Warehouse",
-    purchaseDate: "2023-10-01"
-  },
-  {
-    id: "BTC-013",
-    type: "Monitor",
-    model: "Dell UltraSharp 27\"",
-    serialNumber: "CN-0K4XYZ",
-    assignedTo: "Unassigned",
-    status: "Available",
-    location: "Warehouse",
-    purchaseDate: "2023-10-02"
-  },
-  {
-    id: "BTC-014",
-    type: "Laptop",
-    model: "Dell XPS 15",
-    serialNumber: "5CD4567IJK",
-    assignedTo: "Unassigned",
-    status: "In Repair",
-    location: "Repair Center",
-    purchaseDate: "2023-05-14"
-  },
-  {
-    id: "BTC-015",
-    type: "Mouse",
-    model: "Logitech MX Master 3",
-    serialNumber: "LGI3456MX4",
-    assignedTo: "Unassigned",
-    status: "Available",
-    location: "Warehouse",
-    purchaseDate: "2023-10-03"
-  }
-];
-
 export default function DataTable() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortColumn, setSortColumn] = useState<keyof Asset | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const filteredAssets = mockAssets.filter(asset => {
-    const matchesSearch = 
-      asset.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset.assignedTo.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === "All" || asset.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
+  const [assets] = useState<Asset[]>([
+    {
+      id: "1",
+      assetTag: "BTC-LT-001",
+      type: "Laptop",
+      brand: "MacBook Pro 16\" M3 Pro (36GB/512GB)",
+      serialNumber: "MNW83LL/A-5847",
+      status: "Checked Out",
+      assignedTo: "Sarah Chen",
+      purchaseDate: "2024-01-15"
+    },
+    {
+      id: "2",
+      assetTag: "BTC-LT-002",
+      type: "Laptop",
+      brand: "MacBook Pro 16\" M3 Pro (18GB/512GB)",
+      serialNumber: "MNW83LL/A-5848",
+      status: "Checked Out",
+      assignedTo: "Marcus Rodriguez",
+      purchaseDate: "2024-01-15"
+    },
+    {
+      id: "3",
+      assetTag: "BTC-LT-003",
+      type: "Laptop",
+      brand: "MacBook Air 13\" M3 (16GB/512GB)",
+      serialNumber: "MRXN3LL/A-2947",
+      status: "Checked Out",
+      assignedTo: "Jennifer Patel",
+      purchaseDate: "2024-02-10"
+    },
+    {
+      id: "4",
+      assetTag: "BTC-LT-004",
+      type: "Laptop",
+      brand: "Lenovo ThinkPad X1 Carbon Gen 11",
+      serialNumber: "PF3QWRT8-1102",
+      status: "Available",
+      assignedTo: "—",
+      purchaseDate: "2023-11-20"
+    },
+    {
+      id: "5",
+      assetTag: "BTC-LT-005",
+      type: "Laptop",
+      brand: "MacBook Pro 14\" M3 Pro (18GB/1TB)",
+      serialNumber: "MNW93LL/A-6721",
+      status: "Checked Out",
+      assignedTo: "David Kim",
+      purchaseDate: "2024-03-05"
+    },
+    {
+      id: "6",
+      assetTag: "BTC-MON-045",
+      type: "Monitor",
+      brand: "Dell U2723QE 27\" 4K USB-C",
+      serialNumber: "CN-0WMD42-5829",
+      status: "Checked Out",
+      assignedTo: "Sarah Chen",
+      purchaseDate: "2023-09-12"
+    },
+    {
+      id: "7",
+      assetTag: "BTC-MON-046",
+      type: "Monitor",
+      brand: "Dell P2723DE 27\" QHD",
+      serialNumber: "CN-0WMD42-5830",
+      status: "Checked Out",
+      assignedTo: "Marcus Rodriguez",
+      purchaseDate: "2023-09-12"
+    },
+    {
+      id: "8",
+      assetTag: "BTC-ACC-112",
+      type: "Mouse",
+      brand: "Logitech MX Master 3S",
+      serialNumber: "LGT-2304-8847",
+      status: "Checked Out",
+      assignedTo: "Jennifer Patel",
+      purchaseDate: "2023-08-22"
+    },
+    {
+      id: "9",
+      assetTag: "BTC-ACC-113",
+      type: "Keyboard",
+      brand: "Logitech MX Keys",
+      serialNumber: "LGT-2304-8901",
+      status: "Available",
+      assignedTo: "—",
+      purchaseDate: "2023-08-22"
+    },
+    {
+      id: "10",
+      assetTag: "BTC-DOC-078",
+      type: "Docking Station",
+      brand: "CalDigit TS4 Thunderbolt 4",
+      serialNumber: "CD-TS4-9921",
+      status: "Checked Out",
+      assignedTo: "David Kim",
+      purchaseDate: "2023-10-18"
+    },
+    {
+      id: "11",
+      assetTag: "BTC-LT-006",
+      type: "Laptop",
+      brand: "MacBook Air 13\" M3 (24GB/512GB)",
+      serialNumber: "MRXN3LL/A-2948",
+      status: "In Repair",
+      assignedTo: "Emily Johnson",
+      purchaseDate: "2024-02-10"
+    },
+    {
+      id: "12",
+      assetTag: "BTC-ACC-114",
+      type: "Earphones",
+      brand: "AirPods Pro (2nd gen)",
+      serialNumber: "MTJV3AM/A-4429",
+      status: "Checked Out",
+      assignedTo: "Michael Torres",
+      purchaseDate: "2023-07-14"
+    },
+    {
+      id: "13",
+      assetTag: "BTC-MON-047",
+      type: "Monitor",
+      brand: "Dell U2723QE 27\" 4K USB-C",
+      serialNumber: "CN-0WMD42-5831",
+      status: "Available",
+      assignedTo: "—",
+      purchaseDate: "2023-09-12"
+    },
+    {
+      id: "14",
+      assetTag: "BTC-LT-007",
+      type: "Laptop",
+      brand: "MacBook Pro 16\" M3 Pro (36GB/1TB)",
+      serialNumber: "MNW83LL/A-5849",
+      status: "Checked Out",
+      assignedTo: "Rebecca Foster",
+      purchaseDate: "2024-01-20"
+    },
+    {
+      id: "15",
+      assetTag: "BTC-DOC-079",
+      type: "Docking Station",
+      brand: "CalDigit TS4 Thunderbolt 4",
+      serialNumber: "CD-TS4-9922",
+      status: "In Repair",
+      assignedTo: "—",
+      purchaseDate: "2023-10-18"
+    }
+  ]);
+
+  const handleSort = (column: keyof Asset) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
+
+  const filteredAssets = assets.filter(asset => {
+    const query = searchQuery.toLowerCase();
+    return (
+      asset.assetTag.toLowerCase().includes(query) ||
+      asset.type.toLowerCase().includes(query) ||
+      asset.brand.toLowerCase().includes(query) ||
+      asset.serialNumber.toLowerCase().includes(query) ||
+      asset.status.toLowerCase().includes(query) ||
+      asset.assignedTo.toLowerCase().includes(query) ||
+      asset.purchaseDate.includes(query)
+    );
   });
 
-  const getStatusColor = (status: string) => {
+  const sortedAssets = [...filteredAssets].sort((a, b) => {
+    if (!sortColumn) return 0;
+    
+    const aVal = a[sortColumn];
+    const bVal = b[sortColumn];
+    
+    if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  const getStatusColor = (status: Asset["status"]) => {
     switch (status) {
-      case "Active":
-        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-      case "In Repair":
-        return "bg-amber-500/10 text-amber-400 border-amber-500/20";
       case "Available":
-        return "bg-blue-500/10 text-blue-400 border-blue-500/20";
+        return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+      case "Checked Out":
+        return "bg-blue-500/10 text-blue-400 border border-blue-500/20";
+      case "In Repair":
+        return "bg-orange-500/10 text-orange-400 border border-orange-500/20";
+      case "Retired":
+        return "bg-gray-500/10 text-gray-400 border border-gray-500/20";
       default:
-        return "bg-gray-500/10 text-gray-400 border-gray-500/20";
+        return "bg-gray-500/10 text-gray-400 border border-gray-500/20";
     }
   };
 
@@ -200,100 +224,114 @@ export default function DataTable() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6"
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="bg-slate-800/50 backdrop-blur border border-slate-700/50 rounded-2xl p-6"
     >
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-white mb-1">Assets Inventory</h2>
-          <p className="text-gray-400 text-sm">Manage and track all company assets</p>
-        </div>
-        
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 md:flex-none md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search assets..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
-            />
-          </div>
-          
-          <div className="relative">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="appearance-none bg-white/5 border border-white/10 rounded-lg pl-4 pr-10 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer"
-            >
-              <option value="All">All Status</option>
-              <option value="Active">Active</option>
-              <option value="In Repair">In Repair</option>
-              <option value="Available">Available</option>
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-          </div>
-          
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="bg-gradient-to-r from-[#1E40AF] to-[#3B82F6] text-white rounded-lg px-4 py-2 flex items-center gap-2 font-medium hover:shadow-lg hover:shadow-blue-500/25 transition-all"
-          >
-            <Download className="w-4 h-4" />
-            Export
-          </motion.button>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-white">All Assets</h2>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search assets..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 pr-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-500 transition-colors w-64"
+          />
         </div>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-white/10">
-              <th className="text-left py-4 px-4 text-gray-400 font-medium text-sm">Asset ID</th>
-              <th className="text-left py-4 px-4 text-gray-400 font-medium text-sm">Type</th>
-              <th className="text-left py-4 px-4 text-gray-400 font-medium text-sm">Model</th>
-              <th className="text-left py-4 px-4 text-gray-400 font-medium text-sm">Serial Number</th>
-              <th className="text-left py-4 px-4 text-gray-400 font-medium text-sm">Assigned To</th>
-              <th className="text-left py-4 px-4 text-gray-400 font-medium text-sm">Status</th>
-              <th className="text-left py-4 px-4 text-gray-400 font-medium text-sm">Location</th>
-              <th className="text-left py-4 px-4 text-gray-400 font-medium text-sm">Purchase Date</th>
+            <tr className="border-b border-slate-700">
+              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">
+                <button
+                  onClick={() => handleSort("assetTag")}
+                  className="flex items-center gap-2 hover:text-white transition-colors"
+                >
+                  Asset Tag
+                  <ArrowUpDown className="w-4 h-4" />
+                </button>
+              </th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">
+                <button
+                  onClick={() => handleSort("type")}
+                  className="flex items-center gap-2 hover:text-white transition-colors"
+                >
+                  Type
+                  <ArrowUpDown className="w-4 h-4" />
+                </button>
+              </th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">
+                <button
+                  onClick={() => handleSort("brand")}
+                  className="flex items-center gap-2 hover:text-white transition-colors"
+                >
+                  Brand/Model
+                  <ArrowUpDown className="w-4 h-4" />
+                </button>
+              </th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">
+                <button
+                  onClick={() => handleSort("serialNumber")}
+                  className="flex items-center gap-2 hover:text-white transition-colors"
+                >
+                  Serial Number
+                  <ArrowUpDown className="w-4 h-4" />
+                </button>
+              </th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">
+                <button
+                  onClick={() => handleSort("status")}
+                  className="flex items-center gap-2 hover:text-white transition-colors"
+                >
+                  Status
+                  <ArrowUpDown className="w-4 h-4" />
+                </button>
+              </th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">
+                <button
+                  onClick={() => handleSort("assignedTo")}
+                  className="flex items-center gap-2 hover:text-white transition-colors"
+                >
+                  Assigned To
+                  <ArrowUpDown className="w-4 h-4" />
+                </button>
+              </th>
+              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">
+                <button
+                  onClick={() => handleSort("purchaseDate")}
+                  className="flex items-center gap-2 hover:text-white transition-colors"
+                >
+                  Purchase Date
+                  <ArrowUpDown className="w-4 h-4" />
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>
-            {filteredAssets.map((asset, index) => (
+            {sortedAssets.map((asset, index) => (
               <motion.tr
                 key={asset.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group"
+                className="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors"
               >
+                <td className="py-4 px-4 text-sm font-medium text-white">{asset.assetTag}</td>
+                <td className="py-4 px-4 text-sm text-gray-300">{asset.type}</td>
+                <td className="py-4 px-4 text-sm text-gray-300 max-w-xs">{asset.brand}</td>
+                <td className="py-4 px-4 text-sm text-gray-400 font-mono">{asset.serialNumber}</td>
                 <td className="py-4 px-4">
-                  <span className="text-white font-medium group-hover:text-blue-400 transition-colors">{asset.id}</span>
-                </td>
-                <td className="py-4 px-4">
-                  <span className="text-gray-300">{asset.type}</span>
-                </td>
-                <td className="py-4 px-4">
-                  <span className="text-gray-300">{asset.model}</span>
-                </td>
-                <td className="py-4 px-4">
-                  <span className="text-gray-400 font-mono text-sm">{asset.serialNumber}</span>
-                </td>
-                <td className="py-4 px-4">
-                  <span className="text-gray-300">{asset.assignedTo}</span>
-                </td>
-                <td className="py-4 px-4">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(asset.status)}`}>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(asset.status)}`}>
                     {asset.status}
                   </span>
                 </td>
-                <td className="py-4 px-4">
-                  <span className="text-gray-400 text-sm">{asset.location}</span>
-                </td>
-                <td className="py-4 px-4">
-                  <span className="text-gray-400 text-sm">{asset.purchaseDate}</span>
+                <td className="py-4 px-4 text-sm text-gray-300">{asset.assignedTo}</td>
+                <td className="py-4 px-4 text-sm text-gray-400 flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  {new Date(asset.purchaseDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
                 </td>
               </motion.tr>
             ))}
@@ -301,34 +339,11 @@ export default function DataTable() {
         </table>
       </div>
 
-      {filteredAssets.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-400">No assets found matching your criteria</p>
+      {sortedAssets.length === 0 && (
+        <div className="text-center py-12 text-gray-400">
+          No assets found matching your search.
         </div>
       )}
-
-      <div className="mt-6 flex items-center justify-between">
-        <p className="text-gray-400 text-sm">
-          Showing {filteredAssets.length} of {mockAssets.length} assets
-        </p>
-        <div className="flex items-center gap-2">
-          <button className="px-3 py-1 bg-white/5 border border-white/10 rounded text-white hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-            Previous
-          </button>
-          <button className="px-3 py-1 bg-gradient-to-r from-[#1E40AF] to-[#3B82F6] rounded text-white font-medium">
-            1
-          </button>
-          <button className="px-3 py-1 bg-white/5 border border-white/10 rounded text-white hover:bg-white/10 transition-colors">
-            2
-          </button>
-          <button className="px-3 py-1 bg-white/5 border border-white/10 rounded text-white hover:bg-white/10 transition-colors">
-            3
-          </button>
-          <button className="px-3 py-1 bg-white/5 border border-white/10 rounded text-white hover:bg-white/10 transition-colors">
-            Next
-          </button>
-        </div>
-      </div>
     </motion.div>
   );
 }
